@@ -44,7 +44,7 @@ jobs:
       - name: Upload validated ML artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: student-result-ml-artifacts
+          name: student_result_model_missing
           path: |
             student_result_model.pkl
             metrics.json
