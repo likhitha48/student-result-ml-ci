@@ -32,18 +32,16 @@ jobs:
             -p 5000:5000 \
             student-result-prediction:ci
 
-      - name: Test Flask health endpoint
+      - name: Test API
         run: |
           for attempt in {1..20}; do
             if curl --fail --silent http://localhost:5000/; then
-              echo "Health check passed."
+              echo "API test passed."
               exit 0
             fi
-            echo "Waiting for Flask API..."
+            echo "Waiting for API..."
             sleep 3
           done
-
-          echo "Health check failed."
           docker logs student-result-ci
           exit 1
 
@@ -51,7 +49,7 @@ jobs:
         if: always()
         run: docker rm -f student-result-ci || true
 
-      - name: Prepare lowercase GHCR image name
+      - name: Prepare GHCR image name
         run: |
           IMAGE_ID="${REGISTRY}/${{ github.repository_owner }}/${IMAGE_NAME}"
           IMAGE_ID=$(echo "$IMAGE_ID" | tr '[:upper:]' '[:lower:]')
@@ -69,7 +67,7 @@ jobs:
           docker tag student-result-prediction:ci "$IMAGE_ID:latest"
           docker tag student-result-prediction:ci "$IMAGE_ID:sha-${{ github.sha }}"
 
-      - name: Push tested image to GHCR
+      - name: Push image to GHCR
         run: |
           docker push "$IMAGE_ID:latest"
           docker push "$IMAGE_ID:sha-${{ github.sha }}"
